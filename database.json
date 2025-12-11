@@ -1,0 +1,490 @@
+{
+  "releases": [
+    {
+      "id": "REL-2024-X1",
+      "artist": "Lunar Echo",
+      "track_name": "Midnight Velocity",
+      "genre": "Melodic Techno",
+      "bpm": 126,
+      "image": "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=2070&auto=format&fit=crop",
+      "stats": {
+        "revenue": 42500,
+        "budget": 15000,
+        "sentiment": 8.5,
+        "history": [
+          120,
+          135,
+          142,
+          110,
+          155,
+          170,
+          190,
+          210,
+          205,
+          230,
+          245,
+          260,
+          280,
+          290
+        ]
+      },
+      "market_signals": {
+        "competitor_drop": true,
+        "tiktok_trend": "High"
+      }
+    },
+    {
+      "id": "REL-2024-X2",
+      "artist": "Solar Flare",
+      "track_name": "Golden Hour",
+      "genre": "Deep House",
+      "bpm": 122,
+      "image": "https://images.unsplash.com/photo-1493225255756-d9584f8606e9?q=80&w=2070&auto=format&fit=crop",
+      "stats": {
+        "revenue": 12800,
+        "budget": 5000,
+        "sentiment": 9.2,
+        "history": [
+          45,
+          50,
+          48,
+          52,
+          60,
+          85,
+          90,
+          110,
+          115,
+          120,
+          130,
+          145
+        ]
+      },
+      "market_signals": {
+        "competitor_drop": false,
+        "tiktok_trend": "Low"
+      }
+    },
+    {
+      "id": "REL-2024-X3",
+      "artist": "Neon Cyber",
+      "track_name": "Protocol 7",
+      "genre": "Cyberpunk Bass",
+      "bpm": 140,
+      "image": "https://images.unsplash.com/photo-1514525253440-b393452e8d26?q=80&w=2070&auto=format&fit=crop",
+      "stats": {
+        "revenue": 89000,
+        "budget": 25000,
+        "sentiment": 7.8,
+        "history": [
+          300,
+          310,
+          290,
+          350,
+          400,
+          420,
+          450,
+          460,
+          480,
+          500
+        ]
+      },
+      "market_signals": {
+        "competitor_drop": true,
+        "tiktok_trend": "Viral"
+      }
+    },
+    {
+      "id": "REL-2024-X4",
+      "artist": "Velvet Waves",
+      "track_name": "Liquid Sky",
+      "genre": "Liquid DnB",
+      "bpm": 174,
+      "image": "https://source.unsplash.com/800x800/?liquid,dnb,abstract&sig=4",
+      "stats": {
+        "revenue": 62000,
+        "budget": 18000,
+        "sentiment": 8.9,
+        "history": [
+          150,
+          160,
+          155,
+          170,
+          180,
+          175,
+          190,
+          200,
+          210,
+          205,
+          220
+        ]
+      },
+      "market_signals": {
+        "competitor_drop": false,
+        "tiktok_trend": "Medium"
+      }
+    },
+    {
+      "id": "REL-2024-X5",
+      "artist": "Pixel Dreams",
+      "track_name": "Study Session",
+      "genre": "Lo-Fi Beats",
+      "bpm": 85,
+      "image": "https://source.unsplash.com/800x800/?lo-fi,anime,cozy&sig=5",
+      "stats": {
+        "revenue": 15000,
+        "budget": 2000,
+        "sentiment": 9.5,
+        "history": [
+          40,
+          42,
+          45,
+          43,
+          48,
+          50,
+          52,
+          55,
+          53,
+          58,
+          60,
+          62
+        ]
+      },
+      "market_signals": {
+        "competitor_drop": false,
+        "tiktok_trend": "High"
+      }
+    },
+    {
+      "id": "REL-2024-X6",
+      "artist": "Night Rider",
+      "track_name": "Neon Nights",
+      "genre": "Synthwave",
+      "bpm": 105,
+      "image": "https://source.unsplash.com/800x800/?synthwave,neon,car&sig=6",
+      "stats": {
+        "revenue": 34000,
+        "budget": 12000,
+        "sentiment": 8.2,
+        "history": [
+          80,
+          85,
+          90,
+          88,
+          95,
+          100,
+          110,
+          105,
+          115,
+          120
+        ]
+      },
+      "market_signals": {
+        "competitor_drop": true,
+        "tiktok_trend": "Medium"
+      }
+    },
+    {
+      "id": "REL-2024-X7",
+      "artist": "Iron Pulse",
+      "track_name": "Factory Floor",
+      "genre": "Industrial Techno",
+      "bpm": 135,
+      "image": "https://source.unsplash.com/800x800/?industrial,factory,dark&sig=7",
+      "stats": {
+        "revenue": 28000,
+        "budget": 9000,
+        "sentiment": 7.5,
+        "history": [
+          60,
+          65,
+          55,
+          70,
+          75,
+          80,
+          78,
+          85,
+          90,
+          88
+        ]
+      },
+      "market_signals": {
+        "competitor_drop": false,
+        "tiktok_trend": "Low"
+      }
+    },
+    {
+      "id": "REL-2024-X8",
+      "artist": "Glitch Mob",
+      "track_name": "Future Shock",
+      "genre": "Future Bass",
+      "bpm": 150,
+      "image": "https://source.unsplash.com/800x800/?future,bass,glitch&sig=8",
+      "stats": {
+        "revenue": 45000,
+        "budget": 14000,
+        "sentiment": 8.0,
+        "history": [
+          100,
+          110,
+          105,
+          120,
+          125,
+          130,
+          140,
+          135,
+          150,
+          160
+        ]
+      },
+      "market_signals": {
+        "competitor_drop": true,
+        "tiktok_trend": "High"
+      }
+    },
+    {
+      "id": "REL-2024-X9",
+      "artist": "Trap King",
+      "track_name": "Hustle Hard",
+      "genre": "Trap",
+      "bpm": 140,
+      "image": "https://source.unsplash.com/800x800/?trap,urban,gold&sig=9",
+      "stats": {
+        "revenue": 72000,
+        "budget": 20000,
+        "sentiment": 7.9,
+        "history": [
+          180,
+          190,
+          200,
+          210,
+          220,
+          230,
+          240,
+          250,
+          260,
+          270
+        ]
+      },
+      "market_signals": {
+        "competitor_drop": false,
+        "tiktok_trend": "Viral"
+      }
+    },
+    {
+      "id": "REL-2024-X10",
+      "artist": "Cloud Walker",
+      "track_name": "Dreamscape",
+      "genre": "Ambient",
+      "bpm": 90,
+      "image": "https://source.unsplash.com/800x800/?clouds,ambient,sky&sig=10",
+      "stats": {
+        "revenue": 8000,
+        "budget": 1000,
+        "sentiment": 9.8,
+        "history": [
+          20,
+          22,
+          25,
+          24,
+          26,
+          28,
+          30,
+          29,
+          32,
+          35
+        ]
+      },
+      "market_signals": {
+        "competitor_drop": false,
+        "tiktok_trend": "Low"
+      }
+    },
+    {
+      "id": "REL-2024-X11",
+      "artist": "Astral Projection",
+      "track_name": "Galaxy Quest",
+      "genre": "Trance",
+      "bpm": 138,
+      "image": "https://source.unsplash.com/800x800/?space,galaxy,stars&sig=11",
+      "stats": {
+        "revenue": 55000,
+        "budget": 16000,
+        "sentiment": 9.1,
+        "history": [
+          130,
+          140,
+          135,
+          150,
+          160,
+          155,
+          170,
+          180,
+          175,
+          190
+        ]
+      },
+      "market_signals": {
+        "competitor_drop": true,
+        "tiktok_trend": "Medium"
+      }
+    },
+    {
+      "id": "REL-2024-X12",
+      "artist": "Bass Cannon",
+      "track_name": "Drop It",
+      "genre": "Dubstep",
+      "bpm": 145,
+      "image": "https://source.unsplash.com/800x800/?speaker,bass,concert&sig=12",
+      "stats": {
+        "revenue": 68000,
+        "budget": 19000,
+        "sentiment": 8.4,
+        "history": [
+          160,
+          170,
+          180,
+          175,
+          190,
+          200,
+          210,
+          220,
+          230,
+          240
+        ]
+      },
+      "market_signals": {
+        "competitor_drop": false,
+        "tiktok_trend": "High"
+      }
+    },
+    {
+      "id": "REL-2024-X13",
+      "artist": "Indie Soul",
+      "track_name": "Dance Floor",
+      "genre": "Indie Dance",
+      "bpm": 118,
+      "image": "https://source.unsplash.com/800x800/?indie,dance,party&sig=13",
+      "stats": {
+        "revenue": 39000,
+        "budget": 11000,
+        "sentiment": 8.7,
+        "history": [
+          90,
+          95,
+          100,
+          105,
+          110,
+          115,
+          120,
+          125,
+          130,
+          135
+        ]
+      },
+      "market_signals": {
+        "competitor_drop": false,
+        "tiktok_trend": "Medium"
+      }
+    },
+    {
+      "id": "REL-2024-X14",
+      "artist": "Groove Armada",
+      "track_name": "Funky Town",
+      "genre": "Nu-Disco",
+      "bpm": 124,
+      "image": "https://source.unsplash.com/800x800/?disco,funk,ball&sig=14",
+      "stats": {
+        "revenue": 48000,
+        "budget": 13000,
+        "sentiment": 9.0,
+        "history": [
+          110,
+          120,
+          115,
+          130,
+          140,
+          135,
+          150,
+          160,
+          155,
+          170
+        ]
+      },
+      "market_signals": {
+        "competitor_drop": true,
+        "tiktok_trend": "Medium"
+      }
+    },
+    {
+      "id": "REL-2024-X15",
+      "artist": "Hard Corps",
+      "track_name": "Power Up",
+      "genre": "Hardstyle",
+      "bpm": 155,
+      "image": "https://source.unsplash.com/800x800/?hardstyle,festival,crowd&sig=15",
+      "stats": {
+        "revenue": 95000,
+        "budget": 28000,
+        "sentiment": 8.3,
+        "history": [
+          250,
+          260,
+          270,
+          280,
+          290,
+          300,
+          310,
+          320,
+          330,
+          340
+        ]
+      },
+      "market_signals": {
+        "competitor_drop": true,
+        "tiktok_trend": "Viral"
+      }
+    }
+  ],
+  "customers": [
+    {
+      "id": "B2B-01",
+      "name": "Berlin Underground",
+      "avg_order_val": 4500,
+      "region": "EMEA",
+      "bpm": 126,
+      "value": 4500
+    },
+    {
+      "id": "B2B-02",
+      "name": "Tokyo Synth",
+      "avg_order_val": 3200,
+      "region": "APAC",
+      "bpm": 128,
+      "value": 3200
+    },
+    {
+      "id": "B2B-03",
+      "name": "NY Club Corp",
+      "avg_order_val": 5100,
+      "region": "NA",
+      "bpm": 124,
+      "value": 5100
+    },
+    {
+      "id": "B2B-04",
+      "name": "London Bass",
+      "avg_order_val": 2800,
+      "region": "EMEA",
+      "bpm": 140,
+      "value": 2800
+    },
+    {
+      "id": "B2B-05",
+      "name": "Ibiza Nights",
+      "avg_order_val": 6000,
+      "region": "EMEA",
+      "bpm": 122,
+      "value": 6000
+    }
+  ]
+}
