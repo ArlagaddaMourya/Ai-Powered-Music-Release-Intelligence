@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Label Intelligence Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Typography for AI Strategy */
+        .prose h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .prose h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #334155;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .prose p {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .prose ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .prose li {
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-20">
+
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm backdrop-blur-md bg-white/90">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-9 h-9 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-200 hover:scale-105 transition">
+                        <i class="fa-solid fa-layer-group"></i>
+                    </div>
+                    <span class="font-bold text-xl tracking-tight text-gray-900">Music<span
+                            class="text-indigo-600">Intelligence</span></span>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <div class="text-right hidden sm:block">
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest">Active
+                            Roster</label>
+                        <div class="relative">
+                            <select id="release-select" onchange="loadRelease(this.value)"
+                                class="appearance-none pr-6 pl-0 py-0 bg-transparent border-none text-sm font-bold text-gray-900 focus:ring-0 cursor-pointer text-right w-48 hover:text-indigo-600 transition outline-none">
+                            </select>
+                            <i
+                                class="fa-solid fa-chevron-down absolute right-0 top-1 text-xs text-gray-400 pointer-events-none"></i>
+                        </div>
+                    </div>
+                    <img id="header-artist-img" src=""
+                        class="h-10 w-10 rounded-full object-cover border-2 border-indigo-100 shadow-md">
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div
+                class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition duration-300">
+                <div class="text-gray-400 text-xs uppercase font-bold tracking-wider mb-2">Revenue</div>
+                <div class="flex justify-between items-end">
+                    <div id="stat-revenue" class="text-3xl font-black text-gray-900 tracking-tight">$0</div>
+                    <div class="text-green-600 text-xs font-bold bg-green-100 px-2 py-1 rounded-full"><i
+                            class="fa-solid fa-arrow-up mr-1"></i>12%</div>
+                </div>
+            </div>
+            <div
+                class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition duration-300">
+                <div class="text-gray-400 text-xs uppercase font-bold tracking-wider mb-2">Budget Utilized</div>
+                <div class="flex justify-between items-end">
+                    <div id="stat-budget" class="text-3xl font-black text-gray-900 tracking-tight">$0</div>
+                    <div class="text-indigo-600 text-xs font-bold bg-indigo-100 px-2 py-1 rounded-full">Active</div>
+                </div>
+            </div>
+            <div
+                class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition duration-300">
+                <div class="text-gray-400 text-xs uppercase font-bold tracking-wider mb-2">Sentiment</div>
+                <div class="flex justify-between items-end">
+                    <div id="stat-sentiment" class="text-3xl font-black text-gray-900 tracking-tight">0.0</div>
+                    <div class="text-gray-400 text-xs font-bold self-center ml-2">/ 10.0</div>
+                </div>
+            </div>
+            <div
+                class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition duration-300">
+                <div class="text-gray-400 text-xs uppercase font-bold tracking-wider mb-2">Nano Forecast</div>
+                <div class="flex justify-between items-end">
+                    <div class="text-2xl font-black text-indigo-600 tracking-tight">Bullish</div>
+                    <i class="fa-solid fa-chart-line text-indigo-200 text-2xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="border-b border-gray-200">
+            <div class="flex space-x-8 overflow-x-auto pb-1">
+                <button onclick="switchTab('overview')" id="tab-overview"
+                    class="tab-btn text-indigo-600 border-b-2 border-indigo-600 pb-3 text-sm font-bold flex items-center gap-2 transition">
+                    <i class="fa-solid fa-chart-pie"></i> Overview
+                </button>
+                <button onclick="switchTab('segments')" id="tab-segments"
+                    class="tab-btn text-gray-500 hover:text-indigo-600 pb-3 text-sm font-bold flex items-center gap-2 transition">
+                    <i class="fa-solid fa-people-group"></i> Segments
+                </button>
+                <button onclick="switchTab('marketing')" id="tab-marketing"
+                    class="tab-btn text-gray-500 hover:text-indigo-600 pb-3 text-sm font-bold flex items-center gap-2 transition">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> AI Strategy
+                </button>
+                <button onclick="switchTab('database')" id="tab-database"
+                    class="tab-btn text-gray-500 hover:text-indigo-600 pb-3 text-sm font-bold flex items-center gap-2 transition">
+                    <i class="fa-solid fa-table"></i> Database
+                </button>
+            </div>
+        </div>
+
+        <div id="content-overview" class="animate-fade-in grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 h-96 flex flex-col">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2"><i
+                            class="fa-solid fa-robot text-indigo-500"></i> Sales Prediction</h3>
+                    <select id="algo-select" onchange="updateForecastAlgo(this.value)"
+                        class="text-xs border border-gray-300 rounded-lg px-2 py-1 bg-gray-50 text-gray-700 focus:outline-none focus:border-indigo-500 cursor-pointer">
+                        <option value="linear">Linear Regression (Trend)</option>
+                        <option value="gradient_boosting">Gradient Boosting (Pro)</option>
+                        <option value="polynomial">Polynomial (Viral Curve)</option>
+                        <option value="moving_average">Moving Average (Stable)</option>
+                        <option value="exponential">Exponential (Weighted)</option>
+                    </select>
+                </div>
+                <div class="flex-grow relative">
+                    <canvas id="chart-forecast"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 h-96 flex flex-col">
+                <h3 class="font-bold text-gray-800 mb-6 text-sm flex items-center gap-2"><i
+                        class="fa-solid fa-bell text-indigo-500"></i> Market Triggers</h3>
+                <div id="trigger-feed" class="space-y-3 h-full overflow-y-auto pr-2">
+                </div>
+            </div>
+        </div>
+
+        <div id="content-segments" class="hidden animate-fade-in">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 h-[500px] flex flex-col">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2"><i
+                            class="fa-solid fa-layer-group text-pink-500"></i> Customer Clusters (K-Means)</h3>
+                    <div class="flex gap-4 text-xs">
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-400"></span> High
+                            Value</span>
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-400"></span> Mid
+                            Tier</span>
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-gray-400"></span>
+                            Entry Level</span>
+                    </div>
+                </div>
+                <div class="flex-grow relative">
+                    <canvas id="chart-clusters"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-marketing" class="hidden animate-fade-in">
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 min-h-[400px]">
+                <div class="flex items-center justify-between mb-8 pb-4 border-b border-gray-100">
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="bg-gradient-to-r from-violet-600 to-indigo-600 text-white p-3 rounded-xl shadow-lg shadow-indigo-200">
+                            <i class="fa-solid fa-chess-queen text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-2xl text-gray-900 tracking-tight">CMO Intelligence</h3>
+                            <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Strategic Roadmap •
+                                Gemini 2.0 Flash</p>
+                        </div>
+                    </div>
+                    <button onclick="loadRelease(currentReleaseId)"
+                        class="text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-3 py-1.5 rounded-lg transition">
+                        <i class="fa-solid fa-rotate mr-1"></i> Refresh
+                    </button>
+                </div>
+
+                <div id="marketing-strategy" class="space-y-6">
+                    <div class="flex flex-col items-center justify-center h-64 text-gray-400">
+                        <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-3 text-indigo-200"></i>
+                        <p class="text-sm font-medium animate-pulse">Designing Campaign...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-database" class="hidden animate-fade-in space-y-8">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="bg-gray-50 px-6 py-3 border-b border-gray-200">
+                    <h3 class="font-bold text-gray-800 text-xs uppercase tracking-wide">Active Releases</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm text-left">
+                        <thead class="bg-white text-gray-500 font-bold text-xs border-b border-gray-100">
+                            <tr>
+                                <th class="px-6 py-3">Artist</th>
+                                <th class="px-6 py-3">Track</th>
+                                <th class="px-6 py-3">Genre</th>
+                                <th class="px-6 py-3 text-right">Revenue</th>
+                                <th class="px-6 py-3 text-center">Score</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-releases" class="divide-y divide-gray-50 bg-white"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="bg-gray-50 px-6 py-3 border-b border-gray-200">
+                    <h3 class="font-bold text-gray-800 text-xs uppercase tracking-wide">Customer Segments</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm text-left">
+                        <thead class="bg-white text-gray-500 font-bold text-xs border-b border-gray-100">
+                            <tr>
+                                <th class="px-6 py-3">Client</th>
+                                <th class="px-6 py-3">Region</th>
+                                <th class="px-6 py-3 text-right">LTV Value</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-customers" class="divide-y divide-gray-50 bg-white"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 p-6 rounded-xl shadow-inner border border-slate-800">
+                <div class="text-xs font-bold text-slate-500 uppercase mb-2">System JSON</div>
+                <pre id="json-viewer" class="text-green-400 text-xs overflow-auto h-32 font-mono"></pre>
+            </div>
+        </div>
+
+        <div class="mt-8 pt-10 border-t border-gray-200">
+            <div class="flex justify-between items-end mb-6">
+                <div>
+                    <h3 class="font-bold text-2xl text-gray-900">Creative Studio</h3>
+                    <p class="text-sm text-gray-500 mt-1">Instant assets powered by <span
+                            class="text-indigo-600 font-bold">Nano Banana Pro</span>.</p>
+                </div>
+                <button id="btn-generate" onclick="generateBanner()"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg shadow-indigo-200 transition-all hover:-translate-y-1 flex items-center gap-2">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Generate New Banner
+                </button>
+            </div>
+
+            <div class="relative w-full h-80 bg-gray-900 rounded-2xl overflow-hidden shadow-2xl group select-none">
+                <img id="banner-img" src=""
+                    class="w-full h-full object-cover opacity-60 transition-all duration-1000 group-hover:scale-105 group-hover:opacity-70">
+                <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/20 to-transparent"></div>
+                <div class="absolute inset-0 flex flex-col justify-center px-10 md:px-16 z-10">
+                    <p id="banner-artist"
+                        class="text-lg text-indigo-300 font-bold tracking-[0.3em] uppercase mb-1 drop-shadow-md">Artist
+                    </p>
+                    <h2 id="banner-title"
+                        class="text-5xl md:text-7xl font-black text-white tracking-tighter mb-8 drop-shadow-2xl leading-none">
+                        TRACK</h2>
+                    <div class="flex gap-3">
+                        <span
+                            class="px-5 py-2 border border-white/40 bg-white/10 backdrop-blur-md text-white text-[10px] font-bold rounded-full uppercase tracking-widest hover:bg-white hover:text-black transition cursor-pointer">Listen
+                            Now</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <div class="fixed bottom-6 right-6 w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-50 flex flex-col transition-all duration-300"
+        id="chat-container">
+        <div class="bg-slate-900 text-white p-4 flex justify-between items-center cursor-pointer hover:bg-slate-800 transition"
+            onclick="toggleChat()">
+            <div class="flex items-center gap-3">
+                <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+                <h3 class="font-bold text-sm">Music Intelligence AI</h3>
+            </div>
+            <i class="fa-solid fa-chevron-up" id="chat-icon"></i>
+        </div>
+
+        <div id="chat-body" class="h-[350px] overflow-y-auto p-4 bg-slate-50 hidden flex flex-col gap-3">
+            <div class="text-center text-xs text-gray-400 my-4">
+                Connected to Full Database.<br>Ask to compare artists, predict revenue, or analyze trends.
+            </div>
+            <div id="chat-messages" class="flex flex-col gap-3 text-sm"></div>
+        </div>
+
+        <div id="chat-input-area" class="p-3 border-t border-gray-200 bg-white hidden">
+            <form onsubmit="event.preventDefault(); sendMessage();" class="flex gap-2">
+                <input type="text" id="user-input" placeholder="Ask anything..."
+                    class="w-full text-sm border-gray-200 bg-gray-50 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                <button type="submit"
+                    class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition shadow-md">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentReleaseId = '';
+        let forecastChart = null;
+        let clusterChart = null;
+
+        async function init() {
+            // 1. Fetch DB
+            const res = await fetch('/api/database');
+            const data = await res.json();
+            const releases = data.releases || [];
+
+            // 2. Populate Dropdown
+            const select = document.getElementById('release-select');
+            select.innerHTML = releases.map(r => `<option value="${r.id}">${r.artist} - ${r.track_name}</option>`).join('');
+
+            // 3. Render Tables & Clusters
+            renderDatabaseTables(data);
+            renderClusters();
+
+            // 4. Load First
+            if (releases.length > 0) loadRelease(releases[0].id);
+        }
+
+        async function loadRelease(id) {
+            currentReleaseId = id;
+            const algo = document.getElementById('algo-select').value;
+
+            const [rel, fc, mkt, tr] = await Promise.all([
+                fetch(`/api/release/${id}`).then(r => r.json()),
+                fetch(`/api/forecast/${id}?algo=${algo}`).then(r => r.json()),
+                fetch(`/api/marketing/${id}`).then(r => r.json()),
+                fetch(`/api/triggers/${id}`).then(r => r.json())
+            ]);
+
+            // UPDATE UI
+            document.getElementById('header-artist-img').src = rel.image;
+            document.getElementById('stat-revenue').textContent = `$${rel.stats.revenue.toLocaleString()}`;
+            document.getElementById('stat-budget').textContent = `$${rel.stats.budget.toLocaleString()}`;
+            document.getElementById('stat-sentiment').textContent = rel.stats.sentiment;
+
+            // BANNER
+            document.getElementById('banner-img').src = rel.image;
+            document.getElementById('banner-title').textContent = rel.track_name.toUpperCase();
+            document.getElementById('banner-artist').textContent = rel.artist.toUpperCase();
+
+            // CHART
+            renderForecast(fc);
+
+            // STRATEGY (Direct HTML Injection for Advanced UI)
+            document.getElementById('marketing-strategy').innerHTML = mkt.strategy;
+
+            // TRIGGERS
+            document.getElementById('trigger-feed').innerHTML = tr.length ? tr.map(t => `
+                <div class="bg-gray-50 p-3 rounded-lg border-l-4 ${t.color === 'red' ? 'border-red-500' : 'border-green-500'} flex gap-3 items-start">
+                    <div class="${t.color === 'red' ? 'text-red-500' : 'text-green-500'} mt-0.5"><i class="fa-solid fa-circle-exclamation"></i></div>
+                    <div><p class="font-bold text-xs text-gray-800">${t.type}</p><p class="text-xs text-gray-500">${t.msg}</p></div>
+                </div>
+            `).join('') : '<div class="text-center text-gray-400 text-xs italic mt-10">No active signals.</div>';
+        }
+
+        // --- RENDERERS ---
+
+        function renderDatabaseTables(data) {
+            // Release Table
+            document.getElementById('table-releases').innerHTML = data.releases.map(r => `
+                <tr class="hover:bg-gray-50 transition cursor-default group">
+                    <td class="px-6 py-4 flex items-center gap-3 font-medium text-gray-900">
+                        <img src="${r.image}" class="w-8 h-8 rounded-full object-cover shadow-sm group-hover:scale-110 transition">
+                        ${r.artist}
+                    </td>
+                    <td class="px-6 py-4 text-gray-600">${r.track_name}</td>
+                    <td class="px-6 py-4"><span class="bg-indigo-50 text-indigo-600 px-2 py-1 rounded text-xs font-bold border border-indigo-100">${r.genre}</span></td>
+                    <td class="px-6 py-4 text-right font-mono text-gray-700">$${r.stats.revenue.toLocaleString()}</td>
+                    <td class="px-6 py-4 text-center font-bold text-xs ${r.stats.sentiment > 8 ? 'text-green-500' : 'text-yellow-500'}">${r.stats.sentiment}</td>
+                </tr>
+            `).join('');
+
+            // Customer Table
+            document.getElementById('table-customers').innerHTML = data.customers.map(c => `
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-4 font-medium text-gray-900">${c.name}</td>
+                    <td class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">${c.region}</td>
+                    <td class="px-6 py-4 text-right font-mono text-gray-700">$${c.avg_order_val.toLocaleString()}</td>
+                </tr>
+            `).join('');
+
+            document.getElementById('json-viewer').textContent = JSON.stringify(data, null, 2);
+        }
+
+        async function renderClusters() {
+            const res = await fetch('/api/clusters');
+            const data = await res.json();
+            const ctx = document.getElementById('chart-clusters').getContext('2d');
+
+            if (clusterChart) clusterChart.destroy();
+            const colors = ['#f87171', '#60a5fa', '#9ca3af']; // Cluster Colors
+
+            clusterChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Clients',
+                        data: data.map(d => ({ x: d.x, y: d.y })),
+                        backgroundColor: data.map(d => colors[d.cluster] || '#000'),
+                        pointRadius: 8,
+                        pointHoverRadius: 12,
+                        pointHoverBorderColor: '#fff',
+                        pointHoverBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { title: { display: true, text: 'BPM Preference' }, grid: { borderDash: [2, 4] } },
+                        y: { title: { display: true, text: 'Avg Order Value ($)' }, grid: { borderDash: [2, 4] } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        async function updateForecastAlgo(algo) {
+            if (!currentReleaseId) return;
+            const res = await fetch(`/api/forecast/${currentReleaseId}?algo=${algo}`);
+            const data = await res.json();
+            renderForecast(data);
+        }
+
+        async function generateBanner() {
+            const btn = document.getElementById('btn-generate');
+            const img = document.getElementById('banner-img');
+            const originalText = btn.innerHTML;
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Nano Banana Working...';
+            img.classList.add('blur-lg', 'scale-110');
+
+            try {
+                const res = await fetch(`/api/generate-asset/${currentReleaseId}`);
+                const data = await res.json();
+
+                const loader = new Image();
+                loader.onload = () => {
+                    img.src = data.image_url;
+                    img.classList.remove('blur-lg', 'scale-110');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                };
+                loader.src = data.image_url;
+            } catch (e) { console.error(e); btn.disabled = false; btn.innerHTML = originalText; }
+        }
+
+        function renderForecast(data) {
+            const ctx = document.getElementById('chart-forecast').getContext('2d');
+            if (forecastChart) forecastChart.destroy();
+
+            forecastChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Projected Sales',
+                        data: data,
+                        borderColor: '#4f46e5',
+                        backgroundColor: (context) => {
+                            const bg = context.chart.ctx.createLinearGradient(0, 0, 0, 300);
+                            bg.addColorStop(0, 'rgba(79, 70, 229, 0.2)');
+                            bg.addColorStop(1, 'rgba(79, 70, 229, 0)');
+                            return bg;
+                        },
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#4f46e5',
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, grid: { borderDash: [2, 4] } }, x: { grid: { display: false } } }
+                }
+            });
+        }
+
+        // --- UTILS ---
+
+        function switchTab(id) {
+            ['overview', 'segments', 'marketing', 'database'].forEach(t => {
+                document.getElementById(`content-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}`).classList.replace('text-indigo-600', 'text-gray-500');
+                document.getElementById(`tab-${t}`).classList.remove('border-b-2', 'border-indigo-600');
+            });
+            document.getElementById(`content-${id}`).classList.remove('hidden');
+            const btn = document.getElementById(`tab-${id}`);
+            btn.classList.replace('text-gray-500', 'text-indigo-600');
+            btn.classList.add('border-b-2', 'border-indigo-600');
+        }
+
+        function toggleChat() {
+            const body = document.getElementById('chat-body');
+            const input = document.getElementById('chat-input-area');
+            body.classList.toggle('hidden');
+            input.classList.toggle('hidden');
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const msg = input.value;
+            if (!msg) return;
+
+            const box = document.getElementById('chat-messages');
+            box.innerHTML += `<div class="self-end bg-indigo-600 text-white p-3 rounded-2xl rounded-tr-none mb-2 shadow-md max-w-[80%]">${msg}</div>`;
+            input.value = '';
+            box.parentElement.scrollTop = box.parentElement.scrollHeight;
+
+            const loadingId = 'load-' + Date.now();
+            box.innerHTML += `<div id="${loadingId}" class="self-start text-gray-400 text-xs ml-2 mb-2"><i class="fa-solid fa-circle-notch fa-spin"></i> Analyzing...</div>`;
+
+            try {
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: msg, context_id: currentReleaseId })
+                });
+                const data = await res.json();
+                document.getElementById(loadingId).remove();
+
+                box.innerHTML += `<div class="self-start bg-white border border-gray-200 text-gray-800 p-3 rounded-2xl rounded-tl-none mb-2 shadow-sm max-w-[85%] leading-relaxed">${data.response}</div>`;
+                box.parentElement.scrollTop = box.parentElement.scrollHeight;
+            } catch (e) { console.error(e); }
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

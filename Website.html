@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MRIP: Technical Design Dashboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+    <!-- Chosen Palette: Stone (Warm Neutral) Base with Indigo/Terra Cotta Accents -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bgMain: '#FAFAF9', // Stone 50
+                        bgCard: '#FFFFFF',
+                        textPrimary: '#1C1917', // Stone 900
+                        textSecondary: '#57534E', // Stone 600
+                        accentPrimary: '#EA580C', // Orange 600 (Terra Cotta)
+                        accentSecondary: '#4F46E5', // Indigo 600
+                        borderSubtle: '#E7E5E4', // Stone 200
+                        success: '#15803D',
+                        warning: '#B45309'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Chart Container Styling per Requirements */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            /* Controlled by parent grid/flex */
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+
+        @media (max-width: 640px) {
+            .chart-container {
+                height: 250px;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #F5F5F4;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #A8A29E;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #78716C;
+        }
+
+        /* Interactive Elements */
+        .interactive-node {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .interactive-node:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-color: #EA580C;
+        }
+
+        .node-active {
+            border-color: #EA580C;
+            background-color: #FFF7ED;
+            border-width: 2px;
+        }
+
+        .tab-btn {
+            transition: all 0.2s ease;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-btn:hover {
+            color: #EA580C;
+        }
+
+        .tab-active {
+            border-bottom-color: #EA580C;
+            color: #EA580C;
+            font-weight: 600;
+        }
+
+        /* Animation classes */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+
+    <!-- Application Structure Plan:
+         1. Header: Professional context.
+         2. Executive Summary: High-level cards summarizing the core "Closed Loop" concept.
+         3. Architecture Explorer: An interactive HTML-grid diagram replacing the Mermaid C4/Component diagrams. Users click nodes to see tech specs (Azure components).
+         4. Functional Modules (The Core): A detailed tabbed section.
+            - Forecasting: Interactive Chart.js graph showing Demand Curves (XGBoost logic).
+            - Customer Intel: Plotly scatter plot showing K-Means segmentation.
+            - Marketing/Triggers: UI mockups for RAG generation and Anomaly alerts.
+         5. Data & Flows: Interactive JSON explorer and a step-by-step "Feedback Loop" simulator.
+         6. Implementation: Security, Deployment (Blue/Green), and API specs.
+    -->
+
+    <!-- Visualization & Content Choices:
+         - Forecasting: Chart.js Line Chart. Goal: Visualize T+30/60/90 predictions. Justification: Best for time-series data mentioned in Module A.
+         - Customer Segmentation: Plotly Scatter. Goal: Visualise B2B buyer clusters. Justification: Best for 2D clustering visualization mentioned in Module B.
+         - Architecture: CSS Grid Layout. Goal: Replace static Mermaid with clickable interactive system map. Justification: Allows user to explore component details without clutter.
+    -->
+
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+
+<body class="bg-bgMain text-textPrimary font-sans antialiased selection:bg-orange-100 selection:text-orange-900">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-borderSubtle shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="h-8 w-8 bg-accentPrimary rounded flex items-center justify-center text-white font-bold text-xl">
+                        M</div>
+                    <span class="font-bold text-xl tracking-tight text-gray-900">MRIP <span
+                            class="font-normal text-gray-500 text-sm">v2.0</span></span>
+                </div>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <button onclick="scrollToSection('summary')"
+                        class="text-sm font-medium text-textSecondary hover:text-accentPrimary transition-colors">Executive
+                        Summary</button>
+                    <button onclick="scrollToSection('architecture')"
+                        class="text-sm font-medium text-textSecondary hover:text-accentPrimary transition-colors">Architecture</button>
+                    <button onclick="scrollToSection('modules')"
+                        class="text-sm font-medium text-textSecondary hover:text-accentPrimary transition-colors">AI
+                        Modules</button>
+                    <button onclick="scrollToSection('workflows')"
+                        class="text-sm font-medium text-textSecondary hover:text-accentPrimary transition-colors">Data &
+                        Workflows</button>
+                </div>
+                <div class="flex items-center">
+                    <span
+                        class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                        Production Ready
+                    </span>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Nav Placeholder -->
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16">
+
+        <!-- SECTION 1: Executive Summary -->
+        <section id="summary" class="scroll-mt-24">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl mb-4">
+                    AI-Powered B2B Music Release Intelligence
+                </h1>
+                <p class="text-lg text-textSecondary">
+                    A unified, closed-loop ecosystem designed to optimize the supply chain via predictive forecasting,
+                    generative marketing, and continuous learning.
+                </p>
+            </div>
+
+            <!-- Core Concepts Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Concept 1 -->
+                <div
+                    class="bg-bgCard p-6 rounded-xl border border-borderSubtle shadow-sm hover:shadow-md transition-shadow">
+                    <div
+                        class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mb-4 text-blue-600 text-2xl">
+                        📥</div>
+                    <h3 class="font-bold text-lg mb-2">Input</h3>
+                    <p class="text-sm text-textSecondary">Ingests metadata from PIM, historical sales from ERP, and
+                        market signals from social APIs.</p>
+                </div>
+                <!-- Concept 2 -->
+                <div
+                    class="bg-bgCard p-6 rounded-xl border border-borderSubtle shadow-sm hover:shadow-md transition-shadow">
+                    <div
+                        class="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center mb-4 text-purple-600 text-2xl">
+                        🧠</div>
+                    <h3 class="font-bold text-lg mb-2">Process</h3>
+                    <p class="text-sm text-textSecondary">Multi-model inference using XGBoost for forecasts and GPT-4o
+                        for generative content.</p>
+                </div>
+                <!-- Concept 3 -->
+                <div
+                    class="bg-bgCard p-6 rounded-xl border border-borderSubtle shadow-sm hover:shadow-md transition-shadow">
+                    <div
+                        class="w-12 h-12 bg-orange-50 rounded-lg flex items-center justify-center mb-4 text-orange-600 text-2xl">
+                        ⚡</div>
+                    <h3 class="font-bold text-lg mb-2">Output</h3>
+                    <p class="text-sm text-textSecondary">Delivers actionable sales forecasts, target customer lists,
+                        and marketing assets.</p>
+                </div>
+                <!-- Concept 4 -->
+                <div
+                    class="bg-bgCard p-6 rounded-xl border border-borderSubtle shadow-sm hover:shadow-md transition-shadow">
+                    <div
+                        class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center mb-4 text-green-600 text-2xl">
+                        🔄</div>
+                    <h3 class="font-bold text-lg mb-2">Feedback</h3>
+                    <p class="text-sm text-textSecondary">Actual sales data retrains models weekly, constantly improving
+                        accuracy (RLHF).</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: Architecture Explorer -->
+        <section id="architecture" class="scroll-mt-24">
+            <div class="flex flex-col md:flex-row gap-6 items-end mb-6 border-b border-borderSubtle pb-4">
+                <div class="flex-1">
+                    <h2 class="text-2xl font-bold text-gray-900">System Architecture</h2>
+                    <p class="text-textSecondary mt-2">
+                        Explore the Azure-native infrastructure. Click on any component node to view its technical
+                        specifications and role within the Lambda Architecture.
+                    </p>
+                </div>
+                <div class="flex gap-2">
+                    <span class="px-3 py-1 text-xs font-mono bg-gray-100 rounded text-gray-600">Azure Native</span>
+                    <span class="px-3 py-1 text-xs font-mono bg-gray-100 rounded text-gray-600">Lambda Pattern</span>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8 h-auto lg:h-[600px]">
+                <!-- Diagram Surface -->
+                <div
+                    class="lg:col-span-2 bg-gray-50 rounded-xl border border-borderSubtle p-6 relative overflow-hidden flex flex-col gap-8">
+
+                    <!-- Layer 1: Sources -->
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="text-xs font-bold text-gray-400 uppercase tracking-widest col-span-3 mb-1">Data
+                            Sources</div>
+                        <div onclick="showArchDetail('pim')"
+                            class="interactive-node bg-white p-3 rounded shadow-sm border border-gray-200 text-center text-sm font-medium">
+                            PIMCore (SQL)</div>
+                        <div onclick="showArchDetail('erp')"
+                            class="interactive-node bg-white p-3 rounded shadow-sm border border-gray-200 text-center text-sm font-medium">
+                            Sales ERP</div>
+                        <div onclick="showArchDetail('ext')"
+                            class="interactive-node bg-white p-3 rounded shadow-sm border border-gray-200 text-center text-sm font-medium">
+                            Ext. APIs</div>
+                    </div>
+
+                    <!-- Flow Arrow -->
+                    <div class="flex justify-center -my-4 text-gray-300 text-xl">⬇</div>
+
+                    <!-- Layer 2: Ingestion & Lake -->
+                    <div
+                        class="grid grid-cols-2 gap-6 p-4 bg-blue-50/50 rounded-lg border border-blue-100 border-dashed">
+                        <div>
+                            <div class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-2">Ingestion</div>
+                            <div class="space-y-2">
+                                <div onclick="showArchDetail('adf')"
+                                    class="interactive-node bg-white p-2 rounded border border-blue-200 text-center text-xs text-blue-900">
+                                    Azure Data Factory</div>
+                                <div onclick="showArchDetail('eh')"
+                                    class="interactive-node bg-white p-2 rounded border border-blue-200 text-center text-xs text-blue-900">
+                                    Event Hubs</div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-2">Lakehouse</div>
+                            <div class="space-y-2">
+                                <div onclick="showArchDetail('adls')"
+                                    class="interactive-node bg-white p-2 rounded border border-blue-200 text-center text-xs text-blue-900">
+                                    ADLS Gen2 (Delta)</div>
+                                <div onclick="showArchDetail('feature')"
+                                    class="interactive-node bg-white p-2 rounded border border-blue-200 text-center text-xs text-blue-900">
+                                    Azure Feature Store</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Flow Arrow -->
+                    <div class="flex justify-center -my-4 text-gray-300 text-xl">⬇</div>
+
+                    <!-- Layer 3: AI Processing -->
+                    <div
+                        class="grid grid-cols-2 gap-6 p-4 bg-purple-50/50 rounded-lg border border-purple-100 border-dashed">
+                        <div>
+                            <div class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">Training
+                                (Batch)</div>
+                            <div onclick="showArchDetail('aml')"
+                                class="interactive-node bg-white p-3 rounded border border-purple-200 text-center text-sm text-purple-900 font-medium">
+                                Azure ML Workspace</div>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">Inference
+                                (Real-time)</div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div onclick="showArchDetail('aks')"
+                                    class="interactive-node bg-white p-2 rounded border border-purple-200 text-center text-xs text-purple-900">
+                                    AKS Cluster</div>
+                                <div onclick="showArchDetail('aoai')"
+                                    class="interactive-node bg-white p-2 rounded border border-purple-200 text-center text-xs text-purple-900">
+                                    Azure OpenAI</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Flow Arrow -->
+                    <div class="flex justify-center -my-4 text-gray-300 text-xl">⬇</div>
+
+                    <!-- Layer 4: Consumption -->
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="text-xs font-bold text-gray-400 uppercase tracking-widest col-span-3 mb-1">
+                            Consumption Layer</div>
+                        <div onclick="showArchDetail('api')"
+                            class="interactive-node bg-white p-3 rounded shadow-sm border border-gray-200 text-center text-sm font-medium">
+                            API Mgmt</div>
+                        <div onclick="showArchDetail('app')"
+                            class="interactive-node bg-white p-3 rounded shadow-sm border border-gray-200 text-center text-sm font-medium">
+                            Web App</div>
+                        <div onclick="showArchDetail('pbi')"
+                            class="interactive-node bg-white p-3 rounded shadow-sm border border-gray-200 text-center text-sm font-medium">
+                            Power BI</div>
+                    </div>
+
+                </div>
+
+                <!-- Detail Sidebar -->
+                <div class="bg-bgCard rounded-xl border border-borderSubtle p-6 flex flex-col shadow-lg">
+                    <h3 class="text-lg font-bold text-gray-900 mb-2 border-b pb-2" id="arch-title">Select a Component
+                    </h3>
+                    <div id="arch-content" class="text-textSecondary text-sm space-y-4 flex-1">
+                        <p>Click on any node in the diagram to view its specific technology, role, and data interactions
+                            as defined in the technical design document.</p>
+                        <div class="mt-8 p-4 bg-yellow-50 rounded border border-yellow-100">
+                            <h4 class="font-bold text-yellow-800 text-xs uppercase mb-2">Security Context</h4>
+                            <p class="text-xs text-yellow-700">All components communicate via <strong>Azure Private
+                                    Link</strong>. Data at rest is encrypted with AES-256. Access is managed via Azure
+                                AD (Entra ID) with strict RBAC policies.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: Functional Modules -->
+        <section id="modules" class="scroll-mt-24">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-900">AI Functional Modules</h2>
+                <p class="text-textSecondary mt-2 max-w-4xl">
+                    The brain of the platform consists of four distinct intelligence modules. Each uses specialized
+                    algorithms to solve specific business problems, from predicting sales to generating creative
+                    content.
+                </p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex space-x-6 border-b border-borderSubtle mb-8 overflow-x-auto">
+                <button onclick="switchModule('forecasting')" id="tab-forecasting"
+                    class="tab-btn tab-active pb-3 text-sm font-medium whitespace-nowrap">Module A: Forecasting</button>
+                <button onclick="switchModule('customer')" id="tab-customer"
+                    class="tab-btn text-textSecondary pb-3 text-sm font-medium whitespace-nowrap">Module B: Customer
+                    Intel</button>
+                <button onclick="switchModule('marketing')" id="tab-marketing"
+                    class="tab-btn text-textSecondary pb-3 text-sm font-medium whitespace-nowrap">Module C: GenAI
+                    Marketing</button>
+                <button onclick="switchModule('triggers')" id="tab-triggers"
+                    class="tab-btn text-textSecondary pb-3 text-sm font-medium whitespace-nowrap">Module D:
+                    Triggers</button>
+            </div>
+
+            <!-- Module Content Area -->
+            <div class="bg-white rounded-xl border border-borderSubtle shadow-sm p-6 min-h-[500px]">
+
+                <!-- CONTENT: Forecasting -->
+                <div id="content-forecasting" class="fade-in space-y-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900">Sales Velocity & Revenue Prediction</h3>
+                            <p class="text-sm text-textSecondary mt-1">Goal: Predict unit sales for T+30, T+60, T+90.
+                                Uses <strong>XGBoost</strong> for regression and <strong>Prophet</strong> for
+                                seasonality.</p>
+                        </div>
+                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-mono">Algorithm: Gradient
+                            Boosting</span>
+                    </div>
+
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="md:col-span-2">
+                            <div class="bg-gray-50 rounded-lg p-4 border border-borderSubtle">
+                                <h4 class="text-xs font-bold text-gray-500 uppercase mb-4">Demand Curve Forecast (P50 vs
+                                    P90)</h4>
+                                <div class="chart-container">
+                                    <canvas id="forecastChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="bg-gray-50 p-4 rounded-lg border border-borderSubtle">
+                                <h4 class="font-bold text-sm mb-2">Input Features</h4>
+                                <ul class="text-xs text-textSecondary space-y-2 list-disc pl-4">
+                                    <li>Artist Historical CAGR</li>
+                                    <li>Genre Velocity</li>
+                                    <li>Seasonality Index</li>
+                                    <li>Pre-order Momentum</li>
+                                </ul>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg border border-borderSubtle">
+                                <h4 class="font-bold text-sm mb-2">Output Metrics</h4>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div class="bg-white p-2 rounded border text-center">
+                                        <div class="text-xs text-gray-500">T+30 Units</div>
+                                        <div class="font-bold text-indigo-600">5,000</div>
+                                    </div>
+                                    <div class="bg-white p-2 rounded border text-center">
+                                        <div class="text-xs text-gray-500">Risk Level</div>
+                                        <div class="font-bold text-green-600">LOW</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONTENT: Customer Intel -->
+                <div id="content-customer" class="hidden fade-in space-y-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900">B2B Customer Segmentation</h3>
+                            <p class="text-sm text-textSecondary mt-1">Goal: Map products to distributors. Uses
+                                <strong>K-Means Clustering</strong> for segmentation and <strong>Logistic
+                                    Regression</strong> for propensity scoring.</p>
+                        </div>
+                        <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded font-mono">Algorithm:
+                            K-Means / Collab Filtering</span>
+                    </div>
+
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="md:col-span-2">
+                            <div class="bg-gray-50 rounded-lg p-4 border border-borderSubtle">
+                                <h4 class="text-xs font-bold text-gray-500 uppercase mb-4">Buyer Cluster Analysis</h4>
+                                <div class="chart-container" id="clusterChart">
+                                    <!-- Plotly renders here -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="bg-white p-4 rounded-lg border border-borderSubtle shadow-sm">
+                                <h4 class="font-bold text-sm mb-3">Recommended Buyers</h4>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between items-center border-b pb-2">
+                                        <div>
+                                            <div class="font-bold text-sm">B2B-55</div>
+                                            <div class="text-xs text-gray-500">Techno Specialist</div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="font-bold text-green-600">92%</div>
+                                            <div class="text-xs text-gray-400">Match</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-between items-center border-b pb-2">
+                                        <div>
+                                            <div class="font-bold text-sm">B2B-12</div>
+                                            <div class="text-xs text-gray-500">High Volume Retail</div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="font-bold text-green-600">88%</div>
+                                            <div class="text-xs text-gray-400">Match</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONTENT: Marketing -->
+                <div id="content-marketing" class="hidden fade-in space-y-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900">Generative Marketing Studio</h3>
+                            <p class="text-sm text-textSecondary mt-1">Goal: Automate asset creation. Uses
+                                <strong>GPT-4o (RAG)</strong> for copy and <strong>DALL-E 3</strong> for visuals.</p>
+                        </div>
+                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded font-mono">Model: GPT-4o /
+                            DALL-E 3</span>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <!-- Text Gen -->
+                        <div class="bg-gray-50 p-6 rounded-lg border border-borderSubtle">
+                            <div class="flex items-center gap-2 mb-4">
+                                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                                <h4 class="font-bold text-sm">AI Copy Generator (RAG)</h4>
+                            </div>
+                            <div
+                                class="bg-white p-4 rounded border border-gray-200 shadow-sm font-mono text-xs text-gray-600 h-64 overflow-y-auto">
+                                <span class="text-blue-600">> System:</span> Retrieving top performing campaigns for
+                                'Melodic Techno' in 'DACH Region'...<br><br>
+                                <span class="text-blue-600">> User:</span> Generate email subject line.<br><br>
+                                <span class="text-green-600">> AI:</span> "Unlock the Underground: Exclusive Pre-order
+                                for Artist X's New EP"<br><br>
+                                <span class="text-blue-600">> User:</span> Generate social caption.<br><br>
+                                <span class="text-green-600">> AI:</span> "The wait is over. 🌑 Dive into the deep
+                                frequencies of [Album Name]. Limited vinyl stock available for our premium partners.
+                                #Techno #NewRelease"<br>
+                            </div>
+                        </div>
+
+                        <!-- Image Gen Mockup -->
+                        <div class="bg-gray-50 p-6 rounded-lg border border-borderSubtle">
+                            <div class="flex items-center gap-2 mb-4">
+                                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                                <h4 class="font-bold text-sm">Visual Asset Generation</h4>
+                            </div>
+                            <div
+                                class="bg-gray-900 rounded h-64 flex items-center justify-center relative overflow-hidden group">
+                                <div class="absolute inset-0 bg-gradient-to-br from-purple-900 to-black opacity-80">
+                                </div>
+                                <div class="relative z-10 text-center">
+                                    <div class="text-white text-4xl mb-2">🎵</div>
+                                    <p class="text-gray-300 text-xs">Generating assets based on tags:<br>"Melancholic",
+                                        "Summer", "Electronic"</p>
+                                </div>
+                                <!-- Mock generated badges -->
+                                <div
+                                    class="absolute bottom-4 left-4 bg-white/10 backdrop-blur px-2 py-1 rounded text-[10px] text-white">
+                                    Banner_1080x1080.png</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONTENT: Triggers -->
+                <div id="content-triggers" class="hidden fade-in space-y-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900">Trigger Event Detection</h3>
+                            <p class="text-sm text-textSecondary mt-1">Goal: Detect anomalies impacting sales velocity
+                                using <strong>Azure Anomaly Detector</strong>.</p>
+                        </div>
+                        <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded font-mono">Service: Azure Anomaly
+                            Detector</span>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div
+                            class="bg-white border-l-4 border-red-500 shadow-sm p-4 rounded-r-lg flex justify-between items-center">
+                            <div>
+                                <h4 class="font-bold text-red-700">High Impact Alert</h4>
+                                <p class="text-sm text-gray-600">Competitor released similar product today. Forecast
+                                    adjusted down by 15%.</p>
+                            </div>
+                            <span class="text-xs font-mono text-gray-400">Just now</span>
+                        </div>
+                        <div
+                            class="bg-white border-l-4 border-yellow-500 shadow-sm p-4 rounded-r-lg flex justify-between items-center">
+                            <div>
+                                <h4 class="font-bold text-yellow-700">Social Sentiment Spike</h4>
+                                <p class="text-sm text-gray-600">Artist viral on TikTok. Sentiment Score deviated > 2σ.
+                                </p>
+                            </div>
+                            <span class="text-xs font-mono text-gray-400">2 hrs ago</span>
+                        </div>
+                        <div
+                            class="bg-white border-l-4 border-blue-500 shadow-sm p-4 rounded-r-lg flex justify-between items-center">
+                            <div>
+                                <h4 class="font-bold text-blue-700">Cultural Trigger</h4>
+                                <p class="text-sm text-gray-600">Upcoming "Techno Parade" in Berlin identified as sales
+                                    catalyst.</p>
+                            </div>
+                            <span class="text-xs font-mono text-gray-400">1 day ago</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION 4: Data & Workflow Simulator -->
+        <section id="workflows" class="grid lg:grid-cols-2 gap-8 scroll-mt-24">
+
+            <!-- Data Schema -->
+            <div class="space-y-4">
+                <h2 class="text-2xl font-bold text-gray-900">Canonical Data Model</h2>
+                <p class="text-textSecondary text-sm">
+                    The system relies on a "Golden Record" Feature Vector for training and a standardized JSON Output
+                    Object for predictions.
+                </p>
+
+                <div class="bg-gray-900 rounded-lg overflow-hidden border border-gray-700">
+                    <div class="flex bg-gray-800 px-4 py-2 text-xs text-gray-400 border-b border-gray-700">
+                        <button class="mr-4 text-white font-bold border-b-2 border-green-500">Feature Vector</button>
+                        <button class="hover:text-white">Prediction Output</button>
+                    </div>
+                    <pre class="p-4 text-xs font-mono text-green-400 overflow-x-auto">
+{
+  "product_id": "REL-2024-001",
+  "artist_id": "ART-992",
+  "genre_primary": "Techno",
+  "bpm": 128,
+  "release_date": "2024-06-01",
+  "historical_artist_avg_sales": 15000,
+  "social_momentum_score": 0.85,
+  "seasonality_factor": 1.2,
+  "similar_products": ["REL-2023-88"],
+  "marketing_budget_tier": "A"
+}</pre>
+                </div>
+            </div>
+
+            <!-- Operational Workflow Simulator -->
+            <div class="bg-white rounded-xl border border-borderSubtle shadow-sm p-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-4">The Feedback Loop Simulation</h2>
+                <p class="text-sm text-textSecondary mb-6">
+                    Demonstrating the continuous learning cycle. Click the button to simulate a Sales User correcting a
+                    prediction, triggering the retraining loop.
+                </p>
+
+                <div class="relative pl-8 border-l-2 border-gray-200 space-y-8">
+                    <!-- Step 1 -->
+                    <div class="relative">
+                        <div
+                            class="absolute -left-[41px] bg-blue-100 text-blue-600 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">
+                            1</div>
+                        <h4 class="font-bold text-sm">Inference</h4>
+                        <p class="text-xs text-textSecondary">System predicts 5,000 units.</p>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="relative">
+                        <div class="absolute -left-[41px] bg-white border-2 border-gray-200 text-gray-400 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm"
+                            id="step2-icon">2</div>
+                        <h4 class="font-bold text-sm">Human Feedback</h4>
+                        <p class="text-xs text-textSecondary mb-2">Sales user inputs actuals/correction.</p>
+                        <button onclick="triggerFeedbackLoop()" id="feedback-btn"
+                            class="bg-accentPrimary hover:bg-orange-700 text-white text-xs px-3 py-1.5 rounded transition-colors">
+                            Simulate "Inaccurate" Feedback
+                        </button>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="relative opacity-50" id="step3">
+                        <div
+                            class="absolute -left-[41px] bg-gray-100 text-gray-400 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">
+                            3</div>
+                        <h4 class="font-bold text-sm">Retraining (MLOps)</h4>
+                        <p class="text-xs text-textSecondary">Pipeline fetches new ground truth, retrains XGBoost,
+                            evaluates vs Test Set.</p>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="relative opacity-50" id="step4">
+                        <div
+                            class="absolute -left-[41px] bg-gray-100 text-gray-400 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">
+                            4</div>
+                        <h4 class="font-bold text-sm">Deployment</h4>
+                        <p class="text-xs text-textSecondary">New model version (v2.1) deployed via Blue/Green strategy.
+                        </p>
+                        <div id="deployment-msg" class="hidden mt-2 text-xs font-bold text-green-600">✓ Accuracy
+                            Improved. Deployed to Production.</div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Footer -->
+        <footer class="border-t border-borderSubtle pt-8 pb-12">
+            <div class="grid md:grid-cols-4 gap-8 text-sm text-textSecondary">
+                <div>
+                    <h5 class="font-bold text-gray-900 mb-2">Documentation</h5>
+                    <ul class="space-y-1">
+                        <li>System Version 2.0</li>
+                        <li>Status: Approved</li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-bold text-gray-900 mb-2">API Endpoints</h5>
+                    <ul class="space-y-1 font-mono text-xs">
+                        <li>POST /v1/forecast/predict</li>
+                        <li>GET /v1/marketing/assets</li>
+                        <li>POST /v1/feedback/sales</li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-bold text-gray-900 mb-2">Security</h5>
+                    <ul class="space-y-1">
+                        <li>Azure AD (Entra ID)</li>
+                        <li>Managed Identities</li>
+                        <li>Private Link</li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-bold text-gray-900 mb-2">Deployment</h5>
+                    <ul class="space-y-1">
+                        <li>Terraform / Bicep</li>
+                        <li>Blue/Green Strategy</li>
+                        <li>GitHub Actions CI/CD</li>
+                    </ul>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- Logic Script -->
+    <script>
+        // --- Data & State ---
+        const archData = {
+            'pim': { title: "PIMCore", desc: "Source of Truth for product metadata (Genre, BPM, Artist). Syncs via Webhook." },
+            'erp': { title: "Sales ERP", desc: "SAP/Dynamics. Provides historical transaction data and pricing logic." },
+            'ext': { title: "External APIs", desc: "Spotify/TikTok APIs for social sentiment and trend signals." },
+            'adf': { title: "Azure Data Factory", desc: "Orchestrates batch ETL pipelines." },
+            'eh': { title: "Azure Event Hubs", desc: "Ingests real-time streams from social media and external signals." },
+            'adls': { title: "ADLS Gen2", desc: "The Data Lake. Stores raw (Bronze), cleansed (Silver), and aggregated (Gold) data." },
+            'feature': { title: "Azure Feature Store", desc: "Versioning for ML features (e.g., 'Artist_CAGR_30d') to ensure training/inference consistency." },
+            'aml': { title: "Azure ML Workspace", desc: "Environment for model training (AutoML & Custom). Tracks experiments via MLflow." },
+            'aks': { title: "AKS Cluster", desc: "Hosts model endpoints and DALL-E/Stable Diffusion containers for scalable inference." },
+            'aoai': { title: "Azure OpenAI", desc: "Managed service for GPT-4o (Text Gen) and DALL-E 3 (Image Gen)." },
+            'api': { title: "API Management", desc: "Gateway for all requests. Handles throttling, auth, and routing." },
+            'app': { title: "Web App Service", desc: "Hosts the Dashboard UI (React/Power BI Embedded)." },
+            'pbi': { title: "Power BI", desc: "Embedded visualizations for executive reporting." }
+        };
+
+        // --- Architecture Explorer Interaction ---
+        function showArchDetail(key) {
+            const data = archData[key];
+            const titleEl = document.getElementById('arch-title');
+            const contentEl = document.getElementById('arch-content');
+
+            // Visual feedback on nodes
+            document.querySelectorAll('.interactive-node').forEach(el => el.classList.remove('node-active'));
+            event.target.classList.add('node-active');
+
+            // Update Sidebar
+            titleEl.innerText = data.title;
+            contentEl.innerHTML = `
+                <div class="fade-in">
+                    <p class="text-gray-700 font-medium mb-4">${data.desc}</p>
+                    <div class="bg-gray-100 p-3 rounded text-xs font-mono text-gray-600">
+                        Component ID: ${key.toUpperCase()}_AZURE_RES_01
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- Module Tab Switching ---
+        function switchModule(modId) {
+            // Buttons
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.remove('tab-active', 'text-gray-900');
+                b.classList.add('text-textSecondary');
+            });
+            document.getElementById(`tab-${modId}`).classList.add('tab-active', 'text-gray-900');
+            document.getElementById(`tab-${modId}`).classList.remove('text-textSecondary');
+
+            // Content
+            ['forecasting', 'customer', 'marketing', 'triggers'].forEach(id => {
+                const el = document.getElementById(`content-${id}`);
+                if (id === modId) {
+                    el.classList.remove('hidden');
+                    // Trigger resize for charts if needed
+                    if (id === 'forecasting' && window.forecastChartInstance) window.forecastChartInstance.resize();
+                    if (id === 'customer') Plotly.Plots.resize('clusterChart');
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+        }
+
+        // --- Simulator Logic ---
+        function triggerFeedbackLoop() {
+            const btn = document.getElementById('feedback-btn');
+            const step2Icon = document.getElementById('step2-icon');
+            const step3 = document.getElementById('step3');
+            const step4 = document.getElementById('step4');
+            const msg = document.getElementById('deployment-msg');
+
+            // UI State Processing
+            btn.disabled = true;
+            btn.innerText = "Processing...";
+            btn.classList.replace('bg-accentPrimary', 'bg-gray-400');
+
+            step2Icon.classList.add('bg-blue-100', 'text-blue-600', 'border-blue-100');
+            step2Icon.classList.remove('bg-white', 'text-gray-400');
+
+            setTimeout(() => {
+                step3.classList.remove('opacity-50');
+                step3.querySelector('.w-8').classList.add('bg-blue-100', 'text-blue-600');
+
+                setTimeout(() => {
+                    step4.classList.remove('opacity-50');
+                    step4.querySelector('.w-8').classList.add('bg-green-100', 'text-green-600');
+                    msg.classList.remove('hidden');
+                    msg.classList.add('fade-in');
+
+                    btn.innerText = "Cycle Complete";
+                }, 1000); // Wait for "Training"
+            }, 1000); // Wait for "Feedback Ingest"
+        }
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // --- Chart Initialization ---
+        window.addEventListener('load', () => {
+
+            // 1. Chart.js - Demand Forecast
+            const ctxForecast = document.getElementById('forecastChart').getContext('2d');
+            window.forecastChartInstance = new Chart(ctxForecast, {
+                type: 'line',
+                data: {
+                    labels: ['T+0', 'T+15', 'T+30', 'T+45', 'T+60', 'T+75', 'T+90'],
+                    datasets: [
+                        {
+                            label: 'Predicted Units (P50)',
+                            data: [0, 2100, 5000, 8500, 10200, 11500, 12500],
+                            borderColor: '#4F46E5', // Indigo
+                            backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Confidence High (P90)',
+                            data: [0, 2300, 5200, 8900, 10800, 12100, 13200],
+                            borderColor: 'transparent',
+                            backgroundColor: 'rgba(79, 70, 229, 0.05)',
+                            fill: '+1', // Fill to next dataset
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Confidence Low (P10)',
+                            data: [0, 1900, 4800, 8100, 9600, 10900, 11800],
+                            borderColor: 'transparent',
+                            backgroundColor: 'transparent', // Lower boundary
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        y: { title: { display: true, text: 'Units Sold' }, beginAtZero: true }
+                    }
+                }
+            });
+
+            // 2. Plotly - Customer Segmentation (K-Means Visual)
+            const trace1 = {
+                x: [10, 15, 13, 17, 12, 11],
+                y: [20, 25, 23, 22, 21, 24],
+                mode: 'markers',
+                type: 'scatter',
+                name: 'High Volume Pop',
+                marker: { size: 12, color: '#4F46E5' }, // Indigo
+                text: ['Buyer A', 'Buyer B', 'Buyer C', 'Buyer D']
+            };
+
+            const trace2 = {
+                x: [40, 45, 42, 47, 44],
+                y: [55, 60, 58, 52, 57],
+                mode: 'markers',
+                type: 'scatter',
+                name: 'Niche Vinyl Spec.',
+                marker: { size: 12, color: '#EA580C' }, // Orange
+                text: ['Shop X', 'Shop Y', 'Shop Z']
+            };
+
+            const traceTarget = {
+                x: [43],
+                y: [56],
+                mode: 'markers',
+                type: 'scatter',
+                name: 'Current Product Fit',
+                marker: { size: 18, color: '#15803D', symbol: 'star' }
+            };
+
+            const layout = {
+                margin: { t: 20, r: 20, b: 40, l: 40 },
+                xaxis: { title: 'Avg Order Value ($)' },
+                yaxis: { title: 'Genre Affinity Score' },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                legend: { orientation: 'h', y: -0.2 },
+                hovermode: 'closest',
+                dragmode: false
+            };
+
+            const config = { responsive: true, displayModeBar: false };
+
+            Plotly.newPlot('clusterChart', [trace1, trace2, traceTarget], layout, config);
+
+        });
+
+    </script>
+</body>
+
+</html>

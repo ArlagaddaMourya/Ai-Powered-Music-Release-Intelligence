@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MRIP: Data Warehouse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bgMain: '#F8FAFC',
+                        accentPrimary: '#F97316',
+                        accentSecondary: '#4F46E5',
+                    },
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-bgMain text-slate-800 font-sans antialiased p-8">
+
+    <div class="max-w-7xl mx-auto space-y-8">
+
+        <!-- Header -->
+        <div class="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <div class="flex items-center gap-4">
+                <div
+                    class="h-12 w-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-2xl shadow-lg">
+                    <i class="fa-solid fa-database"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-slate-900">Data Warehouse</h1>
+                    <p class="text-slate-500 text-sm">Live view of ingestion pipelines and master data.</p>
+                </div>
+            </div>
+            <a href="/"
+                class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg font-medium transition">
+                <i class="fa-solid fa-arrow-left mr-2"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <!-- Competitors Table -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-users-viewfinder text-orange-500"></i> Competitor Landscape
+                </h2>
+                <span class="bg-orange-50 text-orange-600 text-xs font-bold px-3 py-1 rounded-full">Real-time</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-slate-50 text-slate-500 uppercase text-xs font-bold">
+                        <tr>
+                            <th class="px-6 py-4">Competitor Name</th>
+                            <th class="px-6 py-4">BPM</th>
+                            <th class="px-6 py-4">Energy Score</th>
+                            <th class="px-6 py-4">Sales Velocity</th>
+                            <th class="px-6 py-4">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-competitors" class="divide-y divide-slate-100">
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-slate-400">Loading data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Customers Table -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-briefcase text-indigo-500"></i> B2B Partners
+                </h2>
+                <span class="bg-indigo-50 text-indigo-600 text-xs font-bold px-3 py-1 rounded-full">CRM Sync</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-slate-50 text-slate-500 uppercase text-xs font-bold">
+                        <tr>
+                            <th class="px-6 py-4">ID</th>
+                            <th class="px-6 py-4">Partner Name</th>
+                            <th class="px-6 py-4">Region</th>
+                            <th class="px-6 py-4">Avg Order Value</th>
+                            <th class="px-6 py-4">Genre Affinity</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-customers" class="divide-y divide-slate-100">
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-slate-400">Loading data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Signals Grid -->
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h3 class="text-xs font-bold text-slate-400 uppercase mb-2">Market Signal</h3>
+                <div class="flex items-center gap-3 mb-1">
+                    <div class="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center text-pink-500"><i
+                            class="fa-brands fa-tiktok"></i></div>
+                    <div>
+                        <div class="text-sm font-bold text-slate-900">TikTok Trend</div>
+                        <div id="sig-tiktok" class="text-xs text-slate-500">--</div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h3 class="text-xs font-bold text-slate-400 uppercase mb-2">Market Signal</h3>
+                <div class="flex items-center gap-3 mb-1">
+                    <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-500"><i
+                            class="fa-solid fa-arrow-trend-up"></i></div>
+                    <div>
+                        <div class="text-sm font-bold text-slate-900">Similar Artists</div>
+                        <div id="sig-perf" class="text-xs text-slate-500">--</div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h3 class="text-xs font-bold text-slate-400 uppercase mb-2">Market Signal</h3>
+                <div class="flex items-center gap-3 mb-1">
+                    <div class="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-red-500"><i
+                            class="fa-solid fa-calendar-xmark"></i></div>
+                    <div>
+                        <div class="text-sm font-bold text-slate-900">Competitor Drop</div>
+                        <div id="sig-comp" class="text-xs text-slate-500">--</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        async function loadData() {
+            try {
+                const res = await fetch('/api/database');
+                const data = await res.json();
+
+                // 1. Competitors
+                const compRows = data.competitors.map(c => `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="px-6 py-4 font-medium text-slate-900">${c.name}</td>
+                        <td class="px-6 py-4 font-mono text-slate-600">${c.bpm}</td>
+                        <td class="px-6 py-4">
+                            <div class="w-full bg-slate-200 rounded-full h-2 max-w-[100px]">
+                                <div class="bg-orange-500 h-2 rounded-full" style="width: ${c.energy_score * 100}%"></div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 font-mono text-slate-600">${c.sales_velocity}</td>
+                        <td class="px-6 py-4"><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">Active</span></td>
+                    </tr>
+                `).join('');
+                document.getElementById('table-competitors').innerHTML = compRows;
+
+                // 2. Customers
+                const custRows = data.customers.map(c => `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="px-6 py-4 font-mono text-xs text-slate-400">${c.id}</td>
+                        <td class="px-6 py-4 font-medium text-slate-900">${c.name}</td>
+                        <td class="px-6 py-4"><span class="bg-slate-100 text-slate-600 px-2 py-1 rounded text-xs font-bold border border-slate-200">${c.region}</span></td>
+                        <td class="px-6 py-4 font-mono text-slate-600">$${c.avg_order_val.toLocaleString()}</td>
+                        <td class="px-6 py-4 font-bold text-indigo-600">${(c.genre_affinity * 100).toFixed(0)}%</td>
+                    </tr>
+                `).join('');
+                document.getElementById('table-customers').innerHTML = custRows;
+
+                // 3. Signals
+                const sig = data.market_signals;
+                document.getElementById('sig-tiktok').innerText = sig.tiktok_trend_volume;
+                document.getElementById('sig-perf').innerText = sig.similar_artist_performance;
+                document.getElementById('sig-comp').innerText = sig.competitor_drop ? "Yes (High Risk)" : "No (Clear)";
+
+            } catch (e) {
+                console.error(e);
+                alert("Failed to load data. Is the backend running?");
+            }
+        }
+
+        loadData();
+    </script>
+</body>
+
+</html>

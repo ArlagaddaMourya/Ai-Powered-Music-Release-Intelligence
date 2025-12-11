@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Release Intelligence | AI Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .card {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 0.75rem;
+        }
+
+        .btn-primary {
+            background-color: #6366f1;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: #4f46e5;
+            transform: translateY(-1px);
+        }
+
+        .loader {
+            border-top-color: #6366f1;
+            -webkit-animation: spinner 1.5s linear infinite;
+            animation: spinner 1.5s linear infinite;
+        }
+
+        @keyframes spinner {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body class="flex h-screen overflow-hidden">
+
+    <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col">
+        <div class="p-6">
+            <h1 class="text-xl font-bold text-indigo-400"><i class="fa-solid fa-wave-square mr-2"></i>ReleaseAI</h1>
+            <p class="text-xs text-slate-500 mt-1">v2.0 Production Ready</p>
+        </div>
+        <nav class="flex-1 px-4 space-y-2">
+            <a href="#" class="flex items-center px-4 py-3 bg-slate-800 text-white rounded-lg">
+                <i class="fa-solid fa-chart-line w-6"></i> Prediction Core
+            </a>
+            <a href="#"
+                class="flex items-center px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                <i class="fa-solid fa-users w-6"></i> B2B Targets
+            </a>
+            <a href="#"
+                class="flex items-center px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                <i class="fa-solid fa-wand-magic-sparkles w-6"></i> GenAI Studio
+            </a>
+            <a href="#"
+                class="flex items-center px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                <i class="fa-solid fa-database w-6"></i> PIM Connector
+            </a>
+        </nav>
+        <div class="p-4 border-t border-slate-800">
+            <div class="flex items-center">
+                <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center font-bold">JD</div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium">John Doe</p>
+                    <p class="text-xs text-slate-500">Head of Sales</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto p-8">
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h2 class="text-2xl font-bold text-white">New Release Simulation</h2>
+                <p class="text-slate-400">Input metadata to trigger Lambda Architecture inference pipeline.</p>
+            </div>
+            <div class="flex gap-3">
+                <span
+                    class="px-3 py-1 bg-green-900 text-green-300 text-xs rounded-full border border-green-700 flex items-center">
+                    <span class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span> System Online
+                </span>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-12 gap-6">
+
+            <div class="col-span-4 card p-6 h-fit">
+                <h3 class="text-lg font-semibold text-white mb-4 border-b border-slate-700 pb-2">1. Release Metadata
+                </h3>
+                <form id="aiForm" onsubmit="runSimulation(event)">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-400 mb-1">Artist Name</label>
+                            <input type="text" id="artist" value="Neon Void"
+                                class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white focus:border-indigo-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-400 mb-1">Track Title</label>
+                            <input type="text" id="track" value="Midnight Protocol"
+                                class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white focus:border-indigo-500 outline-none">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-400 mb-1">Genre</label>
+                                <select id="genre"
+                                    class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white focus:border-indigo-500 outline-none">
+                                    <option value="Techno">Techno</option>
+                                    <option value="House">House</option>
+                                    <option value="DnB">Drum & Bass</option>
+                                    <option value="Ambient">Ambient</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-400 mb-1">BPM</label>
+                                <input type="number" id="bpm" value="128"
+                                    class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white focus:border-indigo-500 outline-none">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-400 mb-1">Marketing Budget Tier</label>
+                            <select
+                                class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white focus:border-indigo-500 outline-none">
+                                <option>Tier A (Global Push)</option>
+                                <option>Tier B (Regional)</option>
+                                <option>Tier C (Organic)</option>
+                            </select>
+                        </div>
+                        <button type="submit"
+                            class="btn-primary w-full py-2 rounded font-bold text-white mt-4 flex justify-center items-center">
+                            <span id="btnText">Run AI Inference</span>
+                            <div id="loader"
+                                class="loader ease-linear rounded-full border-2 border-t-2 border-gray-200 h-4 w-4 ml-2 hidden">
+                            </div>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="resultsArea"
+                class="col-span-8 space-y-6 opacity-50 pointer-events-none transition-all duration-500">
+
+                <div class="card p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-white">Sales Forecast (T+90 Days)</h3>
+                            <p class="text-sm text-slate-400">Model: XGBoost Ensemble v4.2</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-3xl font-bold text-indigo-400" id="totalUnits">0</div>
+                            <div class="text-xs text-slate-500 uppercase tracking-wide">Proj. Units</div>
+                        </div>
+                    </div>
+                    <div class="h-64">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="card p-6">
+                        <h3 class="text-lg font-semibold text-white mb-3">Target B2B Buyers</h3>
+                        <div class="space-y-3" id="buyerList">
+                        </div>
+                    </div>
+
+                    <div class="card p-6">
+                        <h3 class="text-lg font-semibold text-white mb-3"><i class="fa-solid fa-robot mr-2"></i>GenAI
+                            Marketing</h3>
+                        <div class="bg-slate-900 p-4 rounded border border-slate-800">
+                            <p class="text-xs text-slate-500 mb-2">Generated Pitch (GPT-4o):</p>
+                            <p class="text-sm italic text-slate-300" id="genPitch">
+                                Pending inference...
+                            </p>
+                        </div>
+                        <div class="mt-4 flex gap-2">
+                            <button
+                                class="bg-slate-700 hover:bg-slate-600 text-xs text-white px-3 py-1 rounded">Regenerate</button>
+                            <button
+                                class="bg-indigo-900 hover:bg-indigo-800 text-xs text-indigo-200 px-3 py-1 rounded">Export
+                                to PIM</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Initialize Chart
+        let myChart = null;
+
+        function runSimulation(e) {
+            e.preventDefault();
+
+            // UI States
+            const btnText = document.getElementById('btnText');
+            const loader = document.getElementById('loader');
+            const results = document.getElementById('resultsArea');
+
+            btnText.innerText = "Processing...";
+            loader.classList.remove('hidden');
+
+            // Simulate Network Delay (1.5s)
+            setTimeout(() => {
+                // 1. Reset UI
+                btnText.innerText = "Run AI Inference";
+                loader.classList.add('hidden');
+                results.classList.remove('opacity-50', 'pointer-events-none');
+
+                // 2. Get Inputs
+                const genre = document.getElementById('genre').value;
+                const bpm = document.getElementById('bpm').value;
+
+                // 3. Generate Mock Data based on Genre
+                const data = generateMockData(genre);
+
+                // 4. Update Chart
+                updateChart(data.chartData);
+
+                // 5. Update Numbers
+                document.getElementById('totalUnits').innerText = data.totalUnits.toLocaleString();
+
+                // 6. Update Buyers
+                const buyerList = document.getElementById('buyerList');
+                buyerList.innerHTML = ''; // clear
+                data.buyers.forEach(buyer => {
+                    buyerList.innerHTML += `
+                        <div class="flex justify-between items-center p-2 bg-slate-900 rounded">
+                            <div>
+                                <div class="font-medium text-sm">${buyer.name}</div>
+                                <div class="text-xs text-slate-500">${buyer.reason}</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm font-bold text-green-400">${buyer.score}%</div>
+                                <div class="text-[10px] text-slate-600">Match</div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // 7. Update GenAI Text
+                document.getElementById('genPitch').innerText = `"${data.pitch}"`;
+
+            }, 1500);
+        }
+
+        function generateMockData(genre) {
+            // Mock logic to make the "AI" feel real
+            let labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 8', 'Week 12'];
+            let dataPoints = [];
+            let pitch = "";
+            let buyers = [];
+
+            if (genre === 'Techno') {
+                dataPoints = [1200, 3500, 4200, 4100, 3800, 5000]; // Slow burn, long tail
+                pitch = "Prepare your floors for a hypnotic journey. 'Midnight Protocol' delivers the 128BPM industrial precision your peak-hour playlist demands, with high retention metrics in the Berlin/Detroit cluster.";
+                buyers = [
+                    { name: "Beatport (Hype)", reason: "Genre Fit", score: 98 },
+                    { name: "Spotify (Techno Bunker)", reason: "BPM Alignment", score: 92 }
+                ];
+            } else if (genre === 'House') {
+                dataPoints = [4000, 6000, 5500, 4800, 3000, 2000]; // High start, drop off
+                pitch = "Summer anthem alert. This track features the soulful vocal chops and piano stabs that are currently trending +15% in the UK market. Perfect for 'Happy Hits' placement.";
+                buyers = [
+                    { name: "Apple Music (Dance)", reason: "Vocal Elements", score: 95 },
+                    { name: "Traxsource", reason: "Historical Sales", score: 89 }
+                ];
+            } else {
+                dataPoints = [1000, 1500, 2000, 2500, 3000, 3500]; // Steady growth
+                pitch = "A sonic landscape designed for deep listening. High algorithmic potential for 'Focus' and 'Chill' playlists based on spectral analysis.";
+                buyers = [
+                    { name: "Spotify (Brain Food)", reason: "Mood Analysis", score: 94 },
+                    { name: "Deezer (Zen)", reason: "Low Energy", score: 91 }
+                ];
+            }
+
+            return {
+                chartData: { labels: labels, data: dataPoints },
+                totalUnits: dataPoints.reduce((a, b) => a + b, 0),
+                pitch: pitch,
+                buyers: buyers
+            };
+        }
+
+        function updateChart(data) {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+
+            if (myChart) myChart.destroy();
+
+            // Gradient fill
+            let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(99, 102, 241, 0.5)'); // Indigo
+            gradient.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
+
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Predicted Unit Sales',
+                        data: data.data,
+                        borderColor: '#6366f1',
+                        backgroundColor: gradient,
+                        borderWidth: 2,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#6366f1',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        y: {
+                            grid: { color: '#334155' },
+                            ticks: { color: '#94a3b8' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8' }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
